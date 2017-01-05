@@ -81,10 +81,6 @@ public class ConfigFiles {
             if (itemGroup instanceof Item) {
                 itemGroup = Item.class.cast(itemGroup).getParent();
             }
-            System.out.println("->>"+(itemGroup instanceof AbstractProject));
-            if(itemGroup instanceof AbstractProject) {
-                itemGroup = AbstractProject.class.cast(itemGroup).getParent();
-            }
             if (itemGroup instanceof Jenkins) {
                 // we are on top scope...
                 return (T) GlobalConfigFiles.get().getById(configId);
