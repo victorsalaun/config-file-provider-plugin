@@ -4,15 +4,13 @@ import com.cloudbees.hudson.plugins.folder.AbstractFolder;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.Plugin;
-import hudson.model.Descriptor;
-import hudson.model.Item;
-import hudson.model.ItemGroup;
-import hudson.model.Run;
+import hudson.model.*;
 import jenkins.model.Jenkins;
 import org.jenkinsci.lib.configprovider.model.Config;
 import org.jenkinsci.plugins.configfiles.folder.FolderConfigFileProperty;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -69,6 +67,7 @@ public class ConfigFiles {
     public static <T extends Config> T getByIdOrNull(@Nullable ItemGroup itemGroup, @NonNull String configId) {
 
         while (itemGroup != null) {
+            System.out.println("try with: "+itemGroup.getClass() +" - "+itemGroup.getFullName());
             if (folderPluginInstalled() && itemGroup instanceof AbstractFolder) {
                 final AbstractFolder<?> folder = AbstractFolder.class.cast(itemGroup);
                 ConfigFileStore store = folder.getProperties().get(FolderConfigFileProperty.class);
@@ -82,12 +81,18 @@ public class ConfigFiles {
             if (itemGroup instanceof Item) {
                 itemGroup = Item.class.cast(itemGroup).getParent();
             }
+            System.out.println("->>"+(itemGroup instanceof AbstractProject));
+            if(itemGroup instanceof AbstractProject) {
+                itemGroup = AbstractProject.class.cast(itemGroup).getParent();
+            }
             if (itemGroup instanceof Jenkins) {
                 // we are on top scope...
                 return (T) GlobalConfigFiles.get().getById(configId);
             } else {
                 continue;
             }
+
+
         }
 
         return null;
